@@ -3,7 +3,7 @@ FROM alpine:latest
 MAINTAINER Volodymyr Shynkar <volodymyr.shynkar@gmail.com>
 
 ENV NPM_VERSION=3 CONFIG_FLAGS="--fully-static" NPM_FLAG="--without-npm"
-ENV DEL_PKGS="curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++" 
+ENV DEL_PKGS="curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++"
 
 VOLUME ["/var/www/html/", "/opt/app/"]
 
