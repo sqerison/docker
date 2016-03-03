@@ -2,15 +2,14 @@ FROM alpine:latest
 
 MAINTAINER Volodymyr Shynkar <volodymyr.shynkar@gmail.com>
 
-ENV NPM_VERSION=3 CONFIG_FLAGS="--fully-static" NPM_FLAG="--without-npm"
+ENV VERSION=v5.5.0 NPM_VERSION=3 CONFIG_FLAGS="--fully-static" NPM_FLAG="--without-npm" 
 ENV DEL_PKGS="curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++"
 
 VOLUME ["/var/www/html/", "/opt/app/"]
 
 RUN apk update && apk upgrade
 
-RUN apk add --no-cache curl  \
-  &&  VERSION=`curl -s https://nodejs.org/dist/latest/ | grep '.tar.gz' | head -1 | cut -d'-' -f2` \
+RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++ \
   &&  curl -sSL https://nodejs.org/dist/${VERSION}/node-${VERSION}.tar.gz | tar -xz \
   &&  cd /node-${VERSION} \
   &&  ./configure --prefix=/usr ${CONFIG_FLAGS}\
