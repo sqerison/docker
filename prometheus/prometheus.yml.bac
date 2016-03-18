@@ -1,0 +1,43 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  external_labels:
+      monitor: 'monitor'
+
+# Define workers
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+    target_groups:
+      - targets: ['localhost:9090']
+        labels:
+          group: 'local'
+
+  - job_name: 'cadvisor'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+    target_groups:
+      - targets: ['localhost:8090']
+        labels:
+          monitor: 'cadvisor'
+
+  - job_name: 'container-exporter'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+    target_groups:
+      - targets: ['localhost:9104']
+        labels:
+          monitor: 'container-exporter'
+          
+  - job_name: 'consul-exporter'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+    target_groups:
+      - targets: ['localhost:9107']
+        labels:
+          monitor: 'consul-exporter'
+
+# Alerts file
+rule_files:
+  - '/etc/prometheus/alert.rules'

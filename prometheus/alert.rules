@@ -1,0 +1,61 @@
+## alert.rules ##
+
+# Alert for any instance that is unreachable for >5 minutes.
+ALERT InstanceDown
+	IF up == 0
+	FOR 5m
+	WITH {
+		severity="page"
+	}
+	SUMMARY "Instance {{$labels.instance}} down"
+	DESCRIPTION "{{$labels.instance}} of job {{$labels.job}} has been down for more than 5 minutes."
+
+ALERT HighMemoryAlert
+	IF SUM (container_memory_usage_bytes{job="cadvisor",name!=""}) BY (name, instance)/1000/1000>=256
+	FOR 1m
+	WITH {}
+	SUMMARY "High Memory usage for container"
+	DESCRIPTION "High Memory usage for container on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})MB's"
+
+ALERT HighCPUAlert
+	IF SUM (rate(container_cpu_usage_seconds_total{job="cadvisor",name!=""}[10s])) BY (name, instance) * 100>=10
+	FOR 1m
+	WITH {}
+	SUMMARY "High CPU usage for container"
+	DESCRIPTION "High CPU usage for container on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})%"
+
+
+ALERT HighNetInputAlert
+	IF SUM (container_network_receive_bytes_total{job="cadvisor",name!=""}) BY (name, instance)/1000/1000>=10 
+	FOR 1m
+	WITH {}
+	SUMMARY "High Network Input usage on container"
+	DESCRIPTION "High Network Input usage on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})MB's"
+
+
+ALERT HighNetOutputAlert
+	IF SUM (container_network_transmit_bytes_total{job="cadvisor",name!=""}) BY (name, instance)/1000/1000>=10
+	FOR 1m
+	WITH {}
+	SUMMARY "High Network Output usage on container"
+	DESCRIPTION "High Network Output usage on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})MB's"
+
+ALERT ContainerMissing
+	IF absent(container_last_seen{name!=""}) or on (name) (time() - container_last_seen{name!=""} > 3600)
+	WITH {}
+	DESCRIPTION "Container Missing on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
+
+ALERT ServicesHealth
+	IF min(consul_catalog_service_node_healthy) by (service)  == 0
+	WITH {}
+	DESCRIPTION "Services Health Missing on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
+
+ALERT NodesFailing
+	IF sum by (node, service)(consul_catalog_service_node_healthy == 0)
+	WITH {}
+	DESCRIPTION "Nodes Failing on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
+
+ALERT QuantityOfContainers
+	IF sum(consul_catalog_service_node_healthy == 1) <= 14
+	WITH {}
+	DESCRIPTION "Quantity Of Containers less than 15 on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
