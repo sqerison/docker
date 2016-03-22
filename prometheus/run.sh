@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-#set -x
+set -x
 stack="consul-server cadvisor container-exporter prom-prometheus prom-alertmanager  consul-registrator consul-exporter"
-
+       cd $PWD
 function start {
+
        ip_addr=$(ifconfig eth0 | grep "inet addr" | awk '{print$2}'| cut -d ':' -f2)
        cp prometheus.yml.bac prometheus.yml
        sed -i s/localhost/$ip_addr/g prometheus.yml
@@ -71,6 +72,7 @@ function start {
               prom/prometheus \
               -config.file=/etc/prometheus/prometheus.yml \
               -alertmanager.url=http://localhost:9093
+       cd -
 }
 
 function stop {
