@@ -9,7 +9,8 @@ sudo apt-get update && \
 echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
 apt-get install -y gradle oracle-java8-set-default && \
 update-java-alternatives -s java-8-oracle && \
-apt-get remove -y software-properties-common 
+apt-get remove -y software-properties-common && \
+apt-get autoremove
 
 WORKDIR /opt
 
