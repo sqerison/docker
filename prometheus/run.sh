@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -x
-stack="consul-server cadvisor container-exporter prom-prometheus prom-alertmanager  consul-registrator consul-exporter"
+#set -x
+stack="consul-server cadvisor container-exporter node-exporter prom-prometheus prom-alertmanager  consul-registrator consul-exporter"
        cd $PWD
 function start {
-
+       docker rm -f $stack
        ip_addr=$(ifconfig eth0 | grep "inet addr" | awk '{print$2}'| cut -d ':' -f2)
        cp prometheus.yml.bac prometheus.yml
        sed -i s/localhost/$ip_addr/g prometheus.yml
@@ -35,6 +35,12 @@ function start {
               -v /var/run/docker.sock:/var/run/docker.sock \
               prom/container-exporter &&
 
+       docker run --name node-exporter -d \
+              --restart=always \
+              -v /sys/fs/cgroup:/cgroup \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              -p 9100:9100 --net="host" prom/node-exporter
+
        docker run --name prom-alertmanager -d \
               --restart=always \
               -p 9093:9093 \
@@ -56,7 +62,7 @@ function start {
               --restart=always \
               -p 9107:9107 \
               --link  consul-server:consul-server \
-              --dns=$ip_addr \
+              --dns=127.0.0.1 \
               --dns-search=service.consul \
               prom/consul-exporter \
               -consul.server=consul-server:8500 &&
@@ -71,7 +77,7 @@ function start {
               --link consul-exporter:consul-exporter \
               prom/prometheus \
               -config.file=/etc/prometheus/prometheus.yml \
-              -alertmanager.url=http://localhost:9093
+              -alertmanager.url=http://127.0.0.1:9093
        cd -
 }
 
@@ -85,7 +91,7 @@ function reload {
 }
 
 function restart {
-       docker stop $stack && \
+       docker stop $stack ;\
        docker rm $stack && \
        start
 }

@@ -20,23 +20,26 @@ scrape_configs:
     target_groups:
       - targets: ['localhost:8090']
         labels:
+          group: 'local'
           monitor: 'cadvisor'
 
-  - job_name: 'container-exporter'
+  - job_name: 'node-exporter'
     scrape_interval: 5s
     scrape_timeout: 10s
     target_groups:
-      - targets: ['localhost:9104']
+      - targets: ['localhost:9100']
         labels:
-          monitor: 'container-exporter'
+          group: 'local'
+          monitor: 'node-exporter'
           
-  - job_name: 'consul-exporter'
-    scrape_interval: 5s
-    scrape_timeout: 10s
-    target_groups:
-      - targets: ['localhost:9107']
-        labels:
-          monitor: 'consul-exporter'
+#  - job_name: 'consul-exporter'
+#    scrape_interval: 5s
+#    scrape_timeout: 10s
+#    target_groups:
+#      - targets: ['localhost:9107']
+#        labels:
+#          group: 'local'
+#          monitor: 'consul-exporter'
 
 # Alerts file
 rule_files:
