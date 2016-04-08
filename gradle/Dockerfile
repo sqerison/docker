@@ -14,4 +14,4 @@ apt-get autoremove -y
 
 WORKDIR /opt
 
-ENTRYPOINT ["/usr/bin/gradle"]
+#ENTRYPOINT ["/usr/bin/gradle"]
