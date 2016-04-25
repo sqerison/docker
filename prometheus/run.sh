@@ -75,7 +75,7 @@ function start {
               --link cadvisor:cadvisor \
               --link container-exporter:container-exporter \
               --link consul-exporter:consul-exporter \
-              prom/prometheus \
+              prom/prometheus:0.16.2 \
               -config.file=/etc/prometheus/prometheus.yml \
               -alertmanager.url=http://127.0.0.1:9093
        cd -

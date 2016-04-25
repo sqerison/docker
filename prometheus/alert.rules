@@ -24,6 +24,12 @@ ALERT HighCPUAlert
 	SUMMARY "High CPU usage for container"
 	DESCRIPTION "High CPU usage for container on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})%"
 
+ALERT HighDiskAlert
+        IF container_fs_usage_bytes{id="/",device="/dev/xvda9"}/1000/1000/1000/(container_fs_limit_bytes{id="/",device="/dev/xvda9"}/100/1024/1024/1024)>=80
+        FOR 1m
+        WITH {}
+        SUMMARY "High DISK '/' usage for container"
+        DESCRIPTION "High DISK usage for container on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})%"
 
 ALERT HighNetInputAlert
 	IF SUM (container_network_receive_bytes_total{job="cadvisor",name!=""}) BY (name, instance)/1000/1000>=10 
@@ -43,19 +49,23 @@ ALERT HighNetOutputAlert
 ALERT ContainerMissing
 	IF absent(container_last_seen{name!=""}) or on (name) (time() - container_last_seen{name!=""} > 3600)
 	WITH {}
+	SUMMARY "Container Missing"
 	DESCRIPTION "Container Missing on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
 
 ALERT ServicesHealth
 	IF min(consul_catalog_service_node_healthy) by (service)  == 0
 	WITH {}
+	SUMMARY "Services Health Missing"
 	DESCRIPTION "Services Health Missing on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
 
 ALERT NodesFailing
 	IF sum by (node, service)(consul_catalog_service_node_healthy == 0)
 	WITH {}
+	SUMMARY "Nodes Failing"
 	DESCRIPTION "Nodes Failing on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
 
 ALERT QuantityOfContainers
 	IF sum(consul_catalog_service_node_healthy == 1) <= 14
 	WITH {}
+	SUMMARY "Quantity Of Containers"
 	DESCRIPTION "Quantity Of Containers less than 15 on {{$labels.instance}} for container {{$labels.name}} (current value: {{$value}})"
